@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+
+	<title>BattleRoyale</title>
+
+	<!--http://www.html5rocks.com/en/mobile/mobifying/-->
+	<meta name="viewport"
+		content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1,minimal-ui=true" />
+
+	<!--https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html-->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="format-detection" content="telephone=no">
+
+	<!-- force webkit on 360 -->
+	<meta name="renderer" content="webkit" />
+	<meta name="force-rendering" content="webkit" />
+	<!-- force edge on IE -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="msapplication-tap-highlight" content="no">
+
+	<!-- force full screen on some browser -->
+	<meta name="full-screen" content="yes" />
+	<meta name="x5-fullscreen" content="true" />
+	<meta name="360-fullscreen" content="true" />
+
+	<!--fix fireball/issues/3568 -->
+	<!--<meta name="browsermode" content="application">-->
+	<meta name="x5-page-mode" content="app">
+
+	<!--<link rel="apple-touch-icon" href=".png" />-->
+	<!--<link rel="apple-touch-icon-precomposed" href=".png" />-->
+
+	<link rel="stylesheet" type="text/css" href="style.v1005.css" />
+</head>
+
+<body>
+	<div id="GameDiv" cc_exact_fit_screen="true">
+		<div id="Cocos3dGameContainer">
+
+			<div class="root">
+				<div class="box">
+					<div class="toast" id="toast"></div>
+				</div>
+			</div>
+
+			<div class="splash-screen" id="splash-screen">
+				<img class="splash-screen-image" src="./flashScreenPng.jpg" alt="" id="splash-screen-image">
+				<div class="progress-bar" id="progress-bar">
+					<div class="progress-bar-fill" id="progress-bar-fill"></div>
+					<div class="progress-text" id="progress-text">تحميل......</div>
+				</div>
+			</div>
+
+			<canvas id="GameCanvas" oncontextmenu="event.preventDefault()" tabindex="99"
+				style="position: absolute;top: 0; left: 0;"></canvas>
+
+		</div>
+	</div>
+
+	<script>
+		let addFun = function () {
+			if (window.customObejeck) {
+				return
+			}
+			window.customObejeck = {}
+
+			//定义一个window对象下的弹出提示框的方法
+			window.customObejeck.showToast = function (message, duration) {
+				let toast = document.getElementById('toast');
+				toast.innerText = message;
+
+				toast.style.opacity = 1;
+
+				setTimeout(function () {
+					toast.style.opacity = 0;
+				}, duration);
+			}
+
+			//获取当前是否是在测试环境下运行(R后缀的index是发布版本)
+			window.customObejeck.getIsDebugIndex = function () {
+				return true
+			}
+
+			//获取当前版本号 每一次打包后这里加1就行了
+			window.customObejeck.getVersion = function () {
+				let version = "V1.0.6"
+				return version
+			}
+
+			//将闪屏图片隐藏
+			window.customObejeck.hideFlashScreen = function () {
+				document.getElementById("splash-screen").style.display = "none"
+			}
+		}
+
+		// 根据进度更新进度条的宽度 finished 已经完成的数量 total总数量 total有时候不是很准确
+		function updateProgressBar(finished, total) { //director.ts中修改 bundle.loadScene加了一个进度条回调函数
+			console.log(finished, total)
+			total = 497 + 30
+			if (finished >= 497 && finished < total) {
+				setTimeout(() => {
+					finished += 2
+					finished >= total ? finished = total : finished
+					updateProgressBar(finished, total)
+				}, 200)
+			}
+			let progress = finished / total
+			progress *= 100
+			progress = parseFloat((progress).toFixed(3).slice(0, -1)) //不进位 保留两位小数 50 79.1 80.89 
+			const progressBarFill = document.getElementById('progress-bar-fill');
+			const progressText = document.getElementById("progress-text");
+			progressBarFill.style.width = progress + "%";
+			progressText.textContent = "تحميل:" + "%" + progress;
+		}
+		addFun()
+	</script>
+
+	<script src="./vconsole.min.9e84b.js"></script>
+	<script type="text/javascript">
+		// open web debugger console
+		window.VConsole && (window.vConsole = new VConsole());
+	</script>
+
+	<!-- Polyfills bundle. -->
+	<script src="src/polyfills.bundle.5adbf.js" charset="utf-8"> </script>
+
+	<!-- SystemJS support. -->
+	<script src="src/system.bundle.36d3c.js" charset="utf-8"> </script>
+
+	<!-- Import map -->
+	<script src="src/import-map.e4fc2.json" type="systemjs-importmap" charset="utf-8"> </script>
+
+	<script>
+		System.import('./index.deebe.js').catch(function (err) { console.error(err); })
+	</script>
+
+</body>
+
+</html>
