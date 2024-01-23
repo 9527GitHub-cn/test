@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>BattleRoyale</title>
+	<title>EscapeMonkey</title>
 
 	<!--http://www.html5rocks.com/en/mobile/mobifying/-->
 	<meta name="viewport"
@@ -63,13 +63,13 @@
 
 	<script>
 		let addFun = function () {
-			if (window.customObejeck) {
+			if (window.customObjeck) {
 				return
 			}
-			window.customObejeck = {}
+			window.customObjeck = {}
 
 			//定义一个window对象下的弹出提示框的方法
-			window.customObejeck.showToast = function (message, duration) {
+			window.customObjeck.showToast = function (message, duration) {
 				let toast = document.getElementById('toast');
 				toast.innerText = message;
 
@@ -81,40 +81,55 @@
 			}
 
 			//获取当前是否是在测试环境下运行(R后缀的index是发布版本)
-			window.customObejeck.getIsDebugIndex = function () {
+			window.customObjeck.getIsDebugIndex = function () {
 				return true
 			}
 
 			//获取当前版本号 每一次打包后这里加1就行了
-			window.customObejeck.getVersion = function () {
-				let version = "V1.0.6"
+			window.customObjeck.getVersion = function () {
+				let version = "v1.0.2"
 				return version
 			}
 
 			//将闪屏图片隐藏
-			window.customObejeck.hideFlashScreen = function () {
+			window.customObjeck.hideFlashScreen = function () {
 				document.getElementById("splash-screen").style.display = "none"
 			}
 		}
 
-		// 根据进度更新进度条的宽度 finished 已经完成的数量 total总数量 total有时候不是很准确
-		function updateProgressBar(finished, total) { //director.ts中修改 bundle.loadScene加了一个进度条回调函数
-			console.log(finished, total)
-			total = 497 + 30
-			if (finished >= 497 && finished < total) {
-				setTimeout(() => {
-					finished += 2
-					finished >= total ? finished = total : finished
-					updateProgressBar(finished, total)
-				}, 200)
-			}
-			let progress = finished / total
-			progress *= 100
-			progress = parseFloat((progress).toFixed(3).slice(0, -1)) //不进位 保留两位小数 50 79.1 80.89 
+		let setProgress = function (progressValue) { //除了之后的值
+			progressValue *= 100
+			progressValue = parseFloat((progressValue).toFixed(3).slice(0, -1)) //不进位 保留两位小数 50 79.1 80.89 
 			const progressBarFill = document.getElementById('progress-bar-fill');
 			const progressText = document.getElementById("progress-text");
-			progressBarFill.style.width = progress + "%";
-			progressText.textContent = "تحميل:" + "%" + progress;
+			progressBarFill.style.width = progressValue + "%";
+			progressText.textContent = "تحميل:" + " %" + progressValue;
+		}
+
+		let loadScenetotal = 175 //场景的总计需要加载的（这个修改场景后需要跑一下看看）
+		let socketTotal = 30//更新进度条 - 网络连接部分  30用来网络连接
+		let totalProgress = loadScenetotal + socketTotal //进度条的总计加载
+		let isLoadSceneOver = false
+		// 根据进度更新进度条的宽度 finished 已经完成的数量 total总数量 total有时候不是很准确
+		function updateProgressBar(finished, total) { //director.ts中修改 bundle.loadScene加了一个进度条回调函数
+			console.log("场景加载：", finished, total)
+			if (isLoadSceneOver) return
+			if (finished == loadScenetotal) {
+				//开始网络加载部分
+				isLoadSceneOver = true
+				updateProgressBarBySocket(0)
+			}
+			if (finished > loadScenetotal) return
+			setProgress(finished / totalProgress)
+		}
+
+		let updateProgressBarBySocket = function (finished) {
+			setTimeout(() => {
+				finished += 2
+				finished >= socketTotal ? finished = socketTotal : finished
+				setProgress((finished + loadScenetotal) / totalProgress)
+				updateProgressBarBySocket(finished)
+			}, 200)
 		}
 		addFun()
 	</script>
@@ -132,10 +147,10 @@
 	<script src="src/system.bundle.36d3c.js" charset="utf-8"> </script>
 
 	<!-- Import map -->
-	<script src="src/import-map.e4fc2.json" type="systemjs-importmap" charset="utf-8"> </script>
+	<script src="src/import-map.ab729.json" type="systemjs-importmap" charset="utf-8"> </script>
 
 	<script>
-		System.import('./index.deebe.js').catch(function (err) { console.error(err); })
+		System.import('./index.239f4.js').catch(function (err) { console.error(err); })
 	</script>
 
 </body>
